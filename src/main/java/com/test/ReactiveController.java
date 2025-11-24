@@ -1,19 +1,14 @@
 package com.test;
 
 import static com.test.Config.EMPTY_VALUE;
-import static com.test.Config.REQ_ID_KEY;
 
 import io.micronaut.context.annotation.Value;
-import io.micronaut.context.propagation.slf4j.MdcPropagationContext;
-import io.micronaut.core.propagation.PropagatedContext;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.client.HttpClient;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import reactor.core.publisher.Mono;
 
 @Controller
@@ -40,10 +35,15 @@ public class ReactiveController {
                     var reqIdInPc = Util.findInPc();
                     log.info("ReactiveController: PC {}", reqIdInPc);
 
-                    return reqIdInMdc.orElse(
+                    var reqId = reqIdInMdc.orElse(
                             reqIdInPc.orElse(EMPTY_VALUE));
+
+                    var url = "%s/%s/%s".formatted(clientUrl, clientFilter, reqId);
+                    log.info("ReactiveController: URL {}", url);
+
+                    return url;
                 })
-                .flatMap(reqId -> Mono.from(client.retrieve(HttpRequest.GET("%s/%s".formatted(clientUrl, reqId)), String.class)))
+                .flatMap(url -> Mono.from(client.retrieve(HttpRequest.GET(url), String.class)))
                 .map("{\"reqId\": \"%s\"}"::formatted);
     }
 

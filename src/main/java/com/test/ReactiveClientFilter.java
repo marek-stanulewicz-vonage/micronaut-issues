@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
-@Filter("/*/*/cf-reactive")
+@Filter("/client/cf-reactive/*")
 public class ReactiveClientFilter implements HttpClientFilter {
 
     private static final Logger log = LoggerFactory.getLogger(ReactiveClientFilter.class);

@@ -21,7 +21,8 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     runtimeOnly("org.yaml:snakeyaml")
 
-    implementation("io.micrometer:context-propagation")
+//    implementation("io.micrometer:context-propagation")
+
     implementation("io.projectreactor:reactor-core")
 
     testImplementation("org.testcontainers:testcontainers:2.0.2")

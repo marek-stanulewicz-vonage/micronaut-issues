@@ -40,7 +40,10 @@ public class ImperativeController {
         var reqId = reqIdInMdc.orElse(
                 reqIdInPc.orElse(EMPTY_VALUE));
 
-        var reqIdFromClient = client.toBlocking().retrieve(HttpRequest.GET("%s/%s".formatted(clientUrl, reqId)), String.class);
+        var url = "%s/%s/%s".formatted(clientUrl, clientFilter, reqId);
+        log.info("ImperativeController: URL {}", url);
+
+        var reqIdFromClient = client.toBlocking().retrieve(HttpRequest.GET(url), String.class);
 
         return "{\"reqId\": \"%s\"}".formatted(reqIdFromClient);
     }

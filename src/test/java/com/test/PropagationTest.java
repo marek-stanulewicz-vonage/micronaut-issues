@@ -57,17 +57,21 @@ class PropagationTest implements TestPropertyProvider {
         wiremock.start();
         WireMock.configureFor(wiremock.getMappedPort(8080));
 
-        stubFor(WireMock.get(urlEqualTo("/client/%s".formatted(EMPTY_VALUE)))
-                .willReturn(ok().withBody("%s,%s".formatted(EMPTY_VALUE, EMPTY_VALUE))));
-
-        stub(EMPTY_VALUE, EMPTY_VALUE, EMPTY_VALUE, EMPTY_VALUE);
-        stub(REQ_ID_INPUT, EMPTY_VALUE, REQ_ID_OUTPUT, EMPTY_VALUE);
-        stub(EMPTY_VALUE, REQ_ID_INPUT, EMPTY_VALUE, REQ_ID_OUTPUT);
-        stub(REQ_ID_INPUT, REQ_ID_INPUT, REQ_ID_OUTPUT, REQ_ID_INPUT);
+        stubForClientFilter("cf-imperative");
+        stubForClientFilter("cf-reactive");
     }
 
-    static void stub(String fromController, String fromClientFilter, String out1, String out2) {
-        stubFor(WireMock.get(urlEqualTo("/client/%s".formatted(fromController))).withHeader(REQ_ID_KEY, equalTo(fromClientFilter))
+    static void stubForClientFilter(String clientFilter) {
+        stubFor(WireMock.get(urlEqualTo("/client/%s/%s".formatted(clientFilter, EMPTY_VALUE)))
+                .willReturn(ok().withBody("%s,%s".formatted(EMPTY_VALUE, EMPTY_VALUE))));
+        stub(clientFilter, EMPTY_VALUE, EMPTY_VALUE, EMPTY_VALUE, EMPTY_VALUE);
+        stub(clientFilter, REQ_ID_INPUT, EMPTY_VALUE, REQ_ID_OUTPUT, EMPTY_VALUE);
+        stub(clientFilter, EMPTY_VALUE, REQ_ID_INPUT, EMPTY_VALUE, REQ_ID_OUTPUT);
+        stub(clientFilter, REQ_ID_INPUT, REQ_ID_INPUT, REQ_ID_OUTPUT, REQ_ID_OUTPUT);
+    }
+
+    static void stub(String clientFilter, String fromController, String fromClientFilter, String out1, String out2) {
+        stubFor(WireMock.get(urlEqualTo("/client/%s/%s".formatted(clientFilter, fromController))).withHeader(REQ_ID_KEY, equalTo(fromClientFilter))
                 .willReturn(ok().withBody("%s,%s".formatted(out1, out2))));
     }
 
@@ -122,7 +126,7 @@ class PropagationTest implements TestPropertyProvider {
     @Override
     public @NonNull Map<String, String> getProperties() {
 //        return Map.of();
-        return Map.of("client.url", "http://localhost:%s/client/test".formatted(wiremock.getMappedPort(8080)));
+        return Map.of("client.url", "http://localhost:%s/client".formatted(wiremock.getMappedPort(8080)));
     }
 
 }
