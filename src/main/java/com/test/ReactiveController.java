@@ -10,6 +10,7 @@ import io.micronaut.http.client.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Controller
 public class ReactiveController {
@@ -28,7 +29,9 @@ public class ReactiveController {
 
     @Get("/{serverFilter}/c-reactive/{clientFilter}")
     public Mono<String> test(String serverFilter, String clientFilter) {
-        return Mono.fromCallable(() -> {
+        return Mono.just(serverFilter)
+                .publishOn(Schedulers.newSingle("ReactiveController"))
+                .map(sf -> {
                     var reqIdInMdc = Util.findInMdc();
                     log.info("ReactiveController: MDC {}", reqIdInMdc);
 

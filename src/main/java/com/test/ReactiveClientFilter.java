@@ -3,17 +3,15 @@ package com.test;
 import static com.test.Config.EMPTY_VALUE;
 import static com.test.Config.REQ_ID_KEY;
 
-import io.micronaut.context.propagation.slf4j.MdcPropagationContext;
-import io.micronaut.core.propagation.PropagatedContext;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.annotation.Filter;
 import io.micronaut.http.filter.ClientFilterChain;
 import io.micronaut.http.filter.HttpClientFilter;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Filter("/client/cf-reactive/*")
 public class ReactiveClientFilter implements HttpClientFilter {
@@ -22,7 +20,9 @@ public class ReactiveClientFilter implements HttpClientFilter {
 
     @Override
     public Mono<? extends HttpResponse<?>> doFilter(MutableHttpRequest<?> request, ClientFilterChain chain) {
-        return Mono.fromCallable(() -> addHeader(request))
+        return Mono.just(request)
+                .publishOn(Schedulers.newSingle("ReactiveClientFilter"))
+                .map(this::addHeader)
                 .flatMap(req -> Mono.from(chain.proceed(req)));
     }
 
