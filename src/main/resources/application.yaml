@@ -1,0 +1,6 @@
+micronaut:
+  application:
+    name: demo
+
+client:
+  url: ${CLIENT_URL}

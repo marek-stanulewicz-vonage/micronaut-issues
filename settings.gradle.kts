@@ -1,1 +1,4 @@
-rootProject.name="micronaut-issues"
+
+
+rootProject.name="demo"
+

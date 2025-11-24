@@ -1,7 +1,7 @@
 plugins {
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("io.micronaut.application") version "4.2.1"
-    id("io.micronaut.aot") version "4.2.1"
+    id("io.micronaut.application") version "4.6.1"
+    id("com.gradleup.shadow") version "8.3.9"
+    id("io.micronaut.aot") version "4.6.1"
 }
 
 version = "0.1"
@@ -14,28 +14,37 @@ repositories {
 dependencies {
     annotationProcessor("io.micronaut:micronaut-http-validation")
     annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
-
     implementation("io.micronaut.serde:micronaut-serde-jackson")
-    implementation("io.micronaut.reactor:micronaut-reactor")
-
-    implementation("io.projectreactor:reactor-core")
-
     compileOnly("io.micronaut:micronaut-http-client")
     runtimeOnly("ch.qos.logback:logback-classic")
-
     testImplementation("io.micronaut:micronaut-http-client")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    runtimeOnly("org.yaml:snakeyaml")
+
+    implementation("io.micrometer:context-propagation")
+    implementation("io.projectreactor:reactor-core")
+
+    testImplementation("org.testcontainers:testcontainers:2.0.2")
+    testImplementation("org.wiremock:wiremock:3.13.2")
+    testImplementation("org.eclipse.jetty:jetty-servlet:11.0.26")
+    testImplementation("org.eclipse.jetty:jetty-servlets:11.0.26")
+    testImplementation("org.eclipse.jetty:jetty-webapp:11.0.26")
+    testImplementation("org.eclipse.jetty.http2:http2-server:11.0.26")
+
     testImplementation("org.junit.jupiter:junit-jupiter-params")
 }
 
 application {
-    mainClass.set("com.test.Application")
+    mainClass = "com.test.Application"
 }
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.toVersion("21")
+    targetCompatibility = JavaVersion.toVersion("21")
 }
 
-graalvmNative.toolchainDetection.set(false)
+
+graalvmNative.toolchainDetection = false
+
 micronaut {
     runtime("netty")
     testRuntime("junit5")
@@ -46,12 +55,18 @@ micronaut {
     aot {
         // Please review carefully the optimizations enabled below
         // Check https://micronaut-projects.github.io/micronaut-aot/latest/guide/ for more details
-        optimizeServiceLoading.set(false)
-        convertYamlToJava.set(false)
-        precomputeOperations.set(true)
-        cacheEnvironment.set(true)
-        optimizeClassLoading.set(true)
-        deduceEnvironment.set(true)
-        optimizeNetty.set(true)
+        optimizeServiceLoading = false
+        convertYamlToJava = false
+        precomputeOperations = true
+        cacheEnvironment = true
+        optimizeClassLoading = true
+        deduceEnvironment = true
+        optimizeNetty = true
+        replaceLogbackXml = true
     }
+}
+
+
+tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("dockerfileNative") {
+    jdkVersion = "21"
 }
