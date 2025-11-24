@@ -1,5 +1,6 @@
 package com.test;
 
+import static com.test.Config.REQ_ID_KEY;
 import static io.micronaut.scheduling.TaskExecutors.BLOCKING;
 
 import io.micronaut.context.propagation.slf4j.MdcPropagationContext;
@@ -23,17 +24,17 @@ public class ImperativeServerFilter {
 
     @RequestFilter
     public void parseHeader(HttpRequest<?> req, FilterContinuation<MutableHttpResponse<?>> continuation) {
-        Optional.ofNullable(req.getHeaders().get("X-Req-Id"))
+        Optional.ofNullable(req.getHeaders().get(REQ_ID_KEY))
                 .ifPresentOrElse(id -> {
                     try {
                         log.info("ImperativeServerFilter: {}", id);
-                        MDC.put("reqId", id);
+                        MDC.put(REQ_ID_KEY, id);
                         try (PropagatedContext.Scope ignore = PropagatedContext.getOrEmpty().plus(new MdcPropagationContext())
                                 .propagate()) {
                             continuation.proceed();
                         }
                     } finally {
-                        MDC.remove("reqId");
+                        MDC.remove(REQ_ID_KEY);
                     }
                 }, continuation::proceed);
     }
