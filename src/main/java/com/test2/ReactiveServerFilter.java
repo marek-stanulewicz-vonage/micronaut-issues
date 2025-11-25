@@ -1,25 +1,20 @@
-package com.test;
+package com.test2;
 
 import static com.test.Config.EMPTY_VALUE;
 import static com.test.Config.REQ_ID_KEY;
 
-import io.micronaut.context.propagation.slf4j.MdcPropagationContext;
-import io.micronaut.core.async.propagation.ReactivePropagation;
-import io.micronaut.core.propagation.PropagatedContext;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
 import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-@Filter("/sf-reactive/*/*")
+@Filter("/sf-reactive2/*/*")
 public class ReactiveServerFilter implements HttpServerFilter {
 
     private static final Logger log = LoggerFactory.getLogger(ReactiveServerFilter.class);
@@ -31,11 +26,9 @@ public class ReactiveServerFilter implements HttpServerFilter {
                     String reqIdFromHeader = req.getHeaders().get(REQ_ID_KEY);
                     String reqId = Optional.ofNullable(reqIdFromHeader).orElse(EMPTY_VALUE);
                     log.info("ReactiveServerFilter: {}", reqId);
-
-                    return PropagatedContext.getOrEmpty()
-                            .plus(new MdcPropagationContext(Map.of(REQ_ID_KEY, reqId)));
-                })
-                .flatMap(pc -> Mono.from(ReactivePropagation.propagate(pc, chain.proceed(request))));
+                    return reqId;
+                }).flatMap(reqId -> Mono.from(chain.proceed(request))
+                        .contextWrite(ctx -> ctx.put(REQ_ID_KEY, reqId)));
     }
 
 }

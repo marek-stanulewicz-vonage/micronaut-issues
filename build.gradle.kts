@@ -21,16 +21,11 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     runtimeOnly("org.yaml:snakeyaml")
 
-    implementation("io.micrometer:context-propagation")
+//    implementation("io.micrometer:context-propagation")
 
-    implementation("io.projectreactor:reactor-core")
+    implementation("io.micronaut.reactor:micronaut-reactor")
 
     testImplementation("org.testcontainers:testcontainers:2.0.2")
-//    testImplementation("org.wiremock:wiremock:3.13.2")
-//    testImplementation("org.eclipse.jetty:jetty-servlet:11.0.26")
-//    testImplementation("org.eclipse.jetty:jetty-servlets:11.0.26")
-//    testImplementation("org.eclipse.jetty:jetty-webapp:11.0.26")
-//    testImplementation("org.eclipse.jetty.http2:http2-server:11.0.26")
 
     testImplementation("org.junit.jupiter:junit-jupiter-params")
 }
